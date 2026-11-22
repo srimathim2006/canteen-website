@@ -1,0 +1,17 @@
+# Dependencies
+node_modules/
+
+# SQLite Database
+canteen.db
+*.db
+
+# Environment Files
+.env
+.env.local
+
+# Operating System Files
+.DS_Store
+Thumbs.db
+
+# Log files
+*.log
