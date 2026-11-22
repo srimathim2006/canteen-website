@@ -1,0 +1,108 @@
+<!--
+  public/index.html - Login Page
+  -------------------------------------------------------------
+  This page allows Students, Faculty, and Admin to log into the
+  College Canteen Ordering Website. It includes role selection,
+  input validation, and navigation to the account registration page.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Campus Canteen - Login</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body data-page="login">
+
+  <div class="auth-wrapper">
+    <div class="auth-card">
+      
+      <!-- Brand & Header -->
+      <div class="auth-header">
+        <div class="auth-logo">🍽️</div>
+        <h1>Campus Canteen</h1>
+        <p>Order fresh meals right from your phone</p>
+      </div>
+
+      <!-- Success Banner (e.g. redirected from registration) -->
+      <div id="success-alert" class="alert alert-success" style="display: none;">
+        <span>✅</span>
+        <span id="success-message">Account created! Please log in.</span>
+      </div>
+
+      <!-- Error Alert Box -->
+      <div id="error-alert" class="alert alert-danger" style="display: none;">
+        <span>⚠️</span>
+        <span id="error-message">Invalid credentials.</span>
+      </div>
+
+      <!-- Login Form -->
+      <form id="login-form">
+        
+        <!-- Role Selection -->
+        <label style="display:block; font-size: 0.88rem; font-weight: 600; margin-bottom: 8px;">
+          Choose Your Role:
+        </label>
+        <div class="role-selector">
+          <button type="button" class="role-btn active" data-role="student" id="role-student">
+            <span class="role-icon">🎓</span>
+            <span>Student</span>
+          </button>
+          <button type="button" class="role-btn" data-role="faculty" id="role-faculty">
+            <span class="role-icon">👨‍🏫</span>
+            <span>Faculty</span>
+          </button>
+          <button type="button" class="role-btn" data-role="admin" id="role-admin">
+            <span class="role-icon">👨‍🍳</span>
+            <span>Admin</span>
+          </button>
+        </div>
+        <input type="hidden" id="selected-role" value="student">
+
+        <!-- Username Input -->
+        <div class="form-group">
+          <label for="username">Username</label>
+          <input 
+            type="text" 
+            id="username" 
+            class="form-input" 
+            placeholder="Enter your username" 
+            required 
+            autocomplete="username"
+          >
+        </div>
+
+        <!-- Password Input -->
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input 
+            type="password" 
+            id="password" 
+            class="form-input" 
+            placeholder="Enter your password" 
+            required 
+            autocomplete="current-password"
+          >
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" id="login-submit-btn" class="btn btn-primary btn-lg" style="width: 100%; margin-top: 10px;">
+          <span>Log In</span> <span>🚀</span>
+        </button>
+
+      </form>
+
+      <!-- Registration Link for Real Students & Faculty -->
+      <div style="text-align: center; margin-top: 24px; padding-top: 18px; border-top: 1px solid var(--border-color); font-size: 0.92rem; color: var(--text-muted);">
+        Don't have an account? <a href="register.html" style="color: var(--primary); font-weight: 700; text-decoration: none;">Create an Account</a>
+      </div>
+
+    </div>
+  </div>
+
+  <div id="toast-container" class="toast-container"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>

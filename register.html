@@ -1,0 +1,119 @@
+<!--
+  public/register.html - Student & Faculty Account Registration
+  -------------------------------------------------------------
+  This page allows Students and Faculty to create their own accounts.
+  Note: Admin accounts CANNOT be registered from this page.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Campus Canteen - Create Account</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body data-page="register">
+
+  <div class="auth-wrapper">
+    <div class="auth-card">
+      
+      <!-- Brand & Header -->
+      <div class="auth-header">
+        <div class="auth-logo">🍽️</div>
+        <h1>Create Account</h1>
+        <p>Register as a Student or Faculty to order meals</p>
+      </div>
+
+      <!-- Error Alert Box -->
+      <div id="error-alert" class="alert alert-danger" style="display: none;">
+        <span>⚠️</span>
+        <span id="error-message">Registration failed.</span>
+      </div>
+
+      <!-- Success Alert Box -->
+      <div id="success-alert" class="alert alert-success" style="display: none;">
+        <span>✅</span>
+        <span id="success-message">Account created! Redirecting to login...</span>
+      </div>
+
+      <!-- Registration Form -->
+      <form id="register-form">
+        
+        <!-- Role Selection: ONLY Student & Faculty (NO Admin) -->
+        <label style="display:block; font-size: 0.88rem; font-weight: 600; margin-bottom: 8px;">
+          I am registering as:
+        </label>
+        <div class="role-selector" style="grid-template-columns: 1fr 1fr;">
+          <button type="button" class="role-btn active" data-role="student" id="reg-role-student">
+            <span class="role-icon">🎓</span>
+            <span>Student</span>
+          </button>
+          <button type="button" class="role-btn" data-role="faculty" id="reg-role-faculty">
+            <span class="role-icon">👨‍🏫</span>
+            <span>Faculty</span>
+          </button>
+        </div>
+        <input type="hidden" id="register-selected-role" value="student">
+
+        <!-- Username Input -->
+        <div class="form-group">
+          <label for="reg-username">Username</label>
+          <input 
+            type="text" 
+            id="reg-username" 
+            class="form-input" 
+            placeholder="Choose a username (min 3 chars)" 
+            required 
+            minlength="3"
+            autocomplete="username"
+          >
+        </div>
+
+        <!-- Password Input -->
+        <div class="form-group">
+          <label for="reg-password">Password</label>
+          <input 
+            type="password" 
+            id="reg-password" 
+            class="form-input" 
+            placeholder="Choose a password (min 4 chars)" 
+            required 
+            minlength="4"
+            autocomplete="new-password"
+          >
+        </div>
+
+        <!-- Confirm Password Input -->
+        <div class="form-group">
+          <label for="reg-confirm-password">Confirm Password</label>
+          <input 
+            type="password" 
+            id="reg-confirm-password" 
+            class="form-input" 
+            placeholder="Re-enter your password" 
+            required 
+            minlength="4"
+            autocomplete="new-password"
+          >
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" id="register-submit-btn" class="btn btn-primary btn-lg" style="width: 100%; margin-top: 10px;">
+          <span>Create Account</span> <span>🚀</span>
+        </button>
+
+      </form>
+
+      <!-- Back to Login Link -->
+      <div style="text-align: center; margin-top: 24px; padding-top: 18px; border-top: 1px solid var(--border-color); font-size: 0.92rem; color: var(--text-muted);">
+        Already have an account? <a href="index.html" style="color: var(--primary); font-weight: 700; text-decoration: none;">Log In here</a>
+      </div>
+
+    </div>
+  </div>
+
+  <div id="toast-container" class="toast-container"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>

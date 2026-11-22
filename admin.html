@@ -1,0 +1,319 @@
+<!--
+  public/admin.html - Admin Management Dashboard
+  -------------------------------------------------------------
+  This page allows canteen administrators to:
+  1. View live summary cards (Total Orders, Pending Orders, Total Earnings from Paid orders)
+  2. Manage food items: Add item, Edit name/price, Delete item, and Toggle availability
+  3. Manage all incoming student & faculty orders: update Order Status (Pending/Done),
+     update Payment Status (Paid/Not Paid), and filter by status
+  4. Change administrator password securely
+  5. Log out securely
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Campus Canteen - Admin Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body data-page="admin">
+
+  <!-- Admin Navigation Bar -->
+  <header class="navbar">
+    <a href="#" class="nav-brand">
+      <span class="logo-icon">🍽️</span>
+      <span>Campus Canteen <small style="font-size:0.75rem; background:rgba(0,0,0,0.25); padding: 2px 8px; border-radius: 12px; margin-left: 6px;">ADMIN PORTAL</small></span>
+    </a>
+    
+    <div class="nav-actions">
+      <div class="user-badge">
+        <span>👨‍🍳</span>
+        <span>Administrator</span>
+      </div>
+
+      <!-- Change Password Button -->
+      <button class="btn btn-outline-white btn-sm" onclick="openChangePasswordModal()">
+        <span>🔑</span>
+        <span>Change Password</span>
+      </button>
+
+      <!-- Logout Button -->
+      <button class="btn btn-outline-white btn-sm" onclick="handleLogout()">
+        <span>🚪</span>
+        <span>Logout</span>
+      </button>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <!-- 1. SUMMARY STATISTIC CARDS -->
+    <div class="admin-summary-grid">
+      <!-- Total Orders -->
+      <div class="summary-card orders">
+        <div class="summary-card-icon">📦</div>
+        <div class="summary-details">
+          <h3 id="stat-total-orders">0</h3>
+          <p>TOTAL ORDERS</p>
+        </div>
+      </div>
+
+      <!-- Pending Orders -->
+      <div class="summary-card pending">
+        <div class="summary-card-icon">⏳</div>
+        <div class="summary-details">
+          <h3 id="stat-pending-orders">0</h3>
+          <p>PENDING ORDERS</p>
+        </div>
+      </div>
+
+      <!-- Total Earnings -->
+      <div class="summary-card earnings">
+        <div class="summary-card-icon">💰</div>
+        <div class="summary-details">
+          <h3 id="stat-total-earnings">₹0</h3>
+          <p>TOTAL EARNINGS (PAID)</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. MANAGE FOOD SECTION -->
+    <section class="admin-section">
+      <div class="admin-section-header">
+        <h3 class="section-title" style="margin-bottom: 0;">
+          <span>🍱</span>
+          <span>Manage Food Items</span>
+        </h3>
+        
+        <button class="btn btn-primary" onclick="openAddFoodModal()">
+          <span>➕</span>
+          <span>Add New Food Item</span>
+        </button>
+      </div>
+
+      <!-- Category Filter Pills for Food Management -->
+      <div class="filter-bar">
+        <button class="filter-btn active" onclick="filterAdminFoods('All', this)">All Categories</button>
+        <button class="filter-btn" onclick="filterAdminFoods('Breakfast', this)">🥞 Breakfast</button>
+        <button class="filter-btn" onclick="filterAdminFoods('Lunch', this)">🍛 Lunch</button>
+        <button class="filter-btn" onclick="filterAdminFoods('Snacks', this)">🥪 Snacks</button>
+      </div>
+
+      <!-- Food Items Table -->
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Food Name</th>
+              <th>Category</th>
+              <th>Price</th>
+              <th>Status</th>
+              <th>Availability Toggle</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="admin-food-table-body">
+            <!-- Dynamically populated via script.js -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 3. MANAGE ORDERS SECTION -->
+    <section class="admin-section">
+      <div class="admin-section-header">
+        <h3 class="section-title" style="margin-bottom: 0;">
+          <span>📋</span>
+          <span>Manage Student & Faculty Orders</span>
+        </h3>
+
+        <button class="btn btn-secondary btn-sm" onclick="loadAdminOrders(); loadAdminSummary();">
+          <span>🔄</span>
+          <span>Refresh Orders</span>
+        </button>
+      </div>
+
+      <!-- Filter Buttons: All, Pending, Done, Paid, Not Paid -->
+      <div class="filter-bar">
+        <button class="filter-btn active" onclick="filterOrders('All', this)">All Orders</button>
+        <button class="filter-btn" onclick="filterOrders('Pending', this)">⏳ Pending</button>
+        <button class="filter-btn" onclick="filterOrders('Done', this)">✅ Done</button>
+        <button class="filter-btn" onclick="filterOrders('Paid', this)">💳 Paid</button>
+        <button class="filter-btn" onclick="filterOrders('Not Paid', this)">❌ Not Paid</button>
+      </div>
+
+      <!-- Orders Table -->
+      <div class="table-responsive">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Order ID</th>
+              <th>Ordered By</th>
+              <th>Food Item</th>
+              <th>Qty</th>
+              <th>Total</th>
+              <th>Time</th>
+              <th>Order Status</th>
+              <th>Payment Status</th>
+            </tr>
+          </thead>
+          <tbody id="admin-orders-table-body">
+            <!-- Dynamically populated via script.js -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ======================================================== -->
+  <!-- MODAL: ADD NEW FOOD ITEM                                 -->
+  <!-- ======================================================== -->
+  <div id="add-food-modal" class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 class="modal-title">➕ Add New Food Item</h3>
+        <button class="modal-close" onclick="closeAddFoodModal()">&times;</button>
+      </div>
+
+      <form id="add-food-form" onsubmit="submitAddFood(event)">
+        <div class="form-group">
+          <label for="add-food-name">Food Item Name</label>
+          <input type="text" id="add-food-name" class="form-input" placeholder="e.g. Masala Dosa" required>
+        </div>
+
+        <div class="form-group">
+          <label for="add-food-category">Category</label>
+          <select id="add-food-category" class="form-input" required>
+            <option value="Breakfast">Breakfast</option>
+            <option value="Lunch">Lunch</option>
+            <option value="Snacks">Snacks</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="add-food-price">Price (₹)</label>
+          <input type="number" id="add-food-price" class="form-input" placeholder="e.g. 50" min="1" step="0.5" required>
+        </div>
+
+        <div class="form-group">
+          <label for="add-food-available">Initial Availability</label>
+          <select id="add-food-available" class="form-input">
+            <option value="1">Available (1)</option>
+            <option value="0">Not Available (0)</option>
+          </select>
+        </div>
+
+        <div style="display: flex; gap: 10px; margin-top: 20px;">
+          <button type="button" class="btn btn-secondary" style="flex: 1;" onclick="closeAddFoodModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary" style="flex: 2;">Save Food Item</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- MODAL: EDIT FOOD ITEM                                    -->
+  <!-- ======================================================== -->
+  <div id="edit-food-modal" class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 class="modal-title">✏️ Edit Food Item</h3>
+        <button class="modal-close" onclick="closeEditFoodModal()">&times;</button>
+      </div>
+
+      <form id="edit-food-form" onsubmit="submitEditFood(event)">
+        <input type="hidden" id="edit-food-id">
+
+        <div class="form-group">
+          <label for="edit-food-name">Food Item Name</label>
+          <input type="text" id="edit-food-name" class="form-input" required>
+        </div>
+
+        <div class="form-group">
+          <label for="edit-food-category">Category</label>
+          <select id="edit-food-category" class="form-input" required>
+            <option value="Breakfast">Breakfast</option>
+            <option value="Lunch">Lunch</option>
+            <option value="Snacks">Snacks</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="edit-food-price">Price (₹)</label>
+          <input type="number" id="edit-food-price" class="form-input" min="1" step="0.5" required>
+        </div>
+
+        <div style="display: flex; gap: 10px; margin-top: 20px;">
+          <button type="button" class="btn btn-secondary" style="flex: 1;" onclick="closeEditFoodModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary" style="flex: 2;">Update Food Item</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- MODAL: CHANGE ADMIN PASSWORD                             -->
+  <!-- ======================================================== -->
+  <div id="change-password-modal" class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 class="modal-title">🔑 Change Admin Password</h3>
+        <button class="modal-close" onclick="closeChangePasswordModal()">&times;</button>
+      </div>
+
+      <form id="change-password-form" onsubmit="submitChangePassword(event)">
+        <div class="form-group">
+          <label for="admin-current-password">Current Password</label>
+          <input 
+            type="password" 
+            id="admin-current-password" 
+            class="form-input" 
+            placeholder="Enter current password" 
+            required 
+            autocomplete="current-password"
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="admin-new-password">New Password</label>
+          <input 
+            type="password" 
+            id="admin-new-password" 
+            class="form-input" 
+            placeholder="Enter new password (min 6 characters)" 
+            required 
+            minlength="6"
+            autocomplete="new-password"
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="admin-confirm-password">Confirm New Password</label>
+          <input 
+            type="password" 
+            id="admin-confirm-password" 
+            class="form-input" 
+            placeholder="Confirm new password" 
+            required 
+            minlength="6"
+            autocomplete="new-password"
+          >
+        </div>
+
+        <div style="display: flex; gap: 10px; margin-top: 20px;">
+          <button type="button" class="btn btn-secondary" style="flex: 1;" onclick="closeChangePasswordModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary" style="flex: 2;" id="change-password-submit-btn">Update Password</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>

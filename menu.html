@@ -1,0 +1,198 @@
+<!--
+  public/menu.html - Student & Faculty Dashboard
+  -------------------------------------------------------------
+  This page allows students and faculty to:
+  1. Browse food categories (Breakfast, Lunch, Snacks)
+  2. View food items with live availability status
+  3. Order items using a popup modal with real-time total calculation
+  4. View their personal order history via the "My Orders" modal
+  5. Log out securely
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Campus Canteen - Order Food</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body data-page="menu">
+
+  <!-- Navigation Bar -->
+  <header class="navbar">
+    <a href="#" class="nav-brand" onclick="showCategoryView(); return false;">
+      <span class="logo-icon">🍽️</span>
+      <span>Campus Canteen</span>
+    </a>
+    
+    <div class="nav-actions">
+      <!-- User info badge -->
+      <div class="user-badge" id="current-user-badge">
+        <span>👤</span>
+        <span id="current-username">Loading...</span>
+      </div>
+
+      <!-- My Orders button -->
+      <button class="btn btn-outline-white btn-sm" id="btn-my-orders" onclick="openMyOrdersModal()">
+        <span>📋</span>
+        <span>My Orders</span>
+      </button>
+
+      <!-- Logout button -->
+      <button class="btn btn-outline-white btn-sm" id="btn-logout" onclick="handleLogout()">
+        <span>🚪</span>
+        <span>Logout</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="container">
+
+    <!-- Greeting Banner -->
+    <div class="hero-banner">
+      <div class="hero-text">
+        <h2 id="welcome-heading">Welcome to Campus Canteen! 👋</h2>
+        <p>Order fresh, hygienic meals prepared on campus with fast kitchen delivery.</p>
+      </div>
+      <div class="hero-icon">🥘</div>
+    </div>
+
+    <!-- VIEW 1: CATEGORY SELECTION (3 BIG CARDS) -->
+    <section id="category-view">
+      <h3 class="section-title">
+        <span>🍽️</span>
+        <span>Select Category</span>
+      </h3>
+
+      <div class="category-grid">
+        <!-- Breakfast Card -->
+        <div class="category-card" onclick="loadCategoryFoods('Breakfast')">
+          <div class="cat-icon">🥞</div>
+          <h3>Breakfast</h3>
+          <p>Idli, Dosa, Poori, Upma, Vada & more hot morning delights</p>
+          <button class="btn btn-primary btn-cat">
+            <span>Explore Breakfast</span>
+            <span>➡️</span>
+          </button>
+        </div>
+
+        <!-- Lunch Card -->
+        <div class="category-card" onclick="loadCategoryFoods('Lunch')">
+          <div class="cat-icon">🍛</div>
+          <h3>Lunch</h3>
+          <p>Veg Biryani, Chicken Biryani, Meals, Curd Rice & more</p>
+          <button class="btn btn-primary btn-cat">
+            <span>Explore Lunch</span>
+            <span>➡️</span>
+          </button>
+        </div>
+
+        <!-- Snacks Card -->
+        <div class="category-card" onclick="loadCategoryFoods('Snacks')">
+          <div class="cat-icon">🥪</div>
+          <h3>Snacks & Drinks</h3>
+          <p>Crispy Samosa, Veg Puff, Burger, Hot Tea & Coffee</p>
+          <button class="btn btn-primary btn-cat">
+            <span>Explore Snacks</span>
+            <span>➡️</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 2: FOOD LIST FOR CHOSEN CATEGORY -->
+    <section id="food-list-view" style="display: none;">
+      <div class="menu-header-bar">
+        <button class="btn btn-secondary" onclick="showCategoryView()">
+          <span>⬅️</span>
+          <span>Back to Categories</span>
+        </button>
+        <h3 id="current-category-title" class="section-title" style="margin-bottom:0;">
+          Breakfast Menu
+        </h3>
+      </div>
+
+      <!-- Food Grid -->
+      <div id="food-items-container" class="food-grid">
+        <!-- Injected dynamically via script.js -->
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ======================================================== -->
+  <!-- MODAL 1: ORDER POPUP MODAL                               -->
+  <!-- ======================================================== -->
+  <div id="order-modal" class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 class="modal-title" id="order-food-name">Food Item</h3>
+        <button class="modal-close" onclick="closeOrderModal()">&times;</button>
+      </div>
+
+      <div style="text-align: center; margin-bottom: 12px;">
+        <span id="order-food-emoji" style="font-size: 3.5rem;">🍲</span>
+        <div style="font-size: 1.1rem; color: var(--text-muted); margin-top: 6px;">
+          Category: <b id="order-food-category">Category</b>
+        </div>
+        <div style="font-size: 1.25rem; font-weight: 700; color: var(--primary-hover); margin-top: 4px;">
+          Price: ₹<span id="order-unit-price">0</span> each
+        </div>
+      </div>
+
+      <!-- Quantity Selector with + and - buttons -->
+      <label style="display: block; text-align: center; font-weight: 600; margin-bottom: 4px;">
+        Select Quantity:
+      </label>
+      <div class="qty-controller">
+        <button type="button" class="qty-btn" onclick="decrementQty()">−</button>
+        <span class="qty-display" id="order-quantity-display">1</span>
+        <button type="button" class="qty-btn" onclick="incrementQty()">+</button>
+      </div>
+
+      <!-- Live Total Calculation Box -->
+      <div class="order-summary-box">
+        <div class="summary-label">Total Amount to Pay:</div>
+        <div class="summary-total">₹<span id="order-live-total">0</span></div>
+      </div>
+
+      <!-- Modal Action Buttons -->
+      <div style="display: flex; gap: 12px;">
+        <button type="button" class="btn btn-secondary" style="flex: 1;" onclick="closeOrderModal()">
+          Cancel
+        </button>
+        <button type="button" class="btn btn-primary" style="flex: 2;" id="confirm-order-btn" onclick="submitOrder()">
+          <span>Order Now</span>
+          <span>⚡</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- MODAL 2: MY ORDERS MODAL                                 -->
+  <!-- ======================================================== -->
+  <div id="my-orders-modal" class="modal-overlay">
+    <div class="modal-box" style="max-width: 750px;">
+      <div class="modal-header">
+        <h3 class="modal-title">📋 My Order History</h3>
+        <button class="modal-close" onclick="closeMyOrdersModal()">&times;</button>
+      </div>
+
+      <div id="my-orders-list-container">
+        <!-- Orders table loaded dynamically -->
+      </div>
+
+      <div style="margin-top: 20px; text-align: right;">
+        <button class="btn btn-secondary" onclick="closeMyOrdersModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>
